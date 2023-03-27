@@ -8,10 +8,12 @@ import { FontAwesome } from '@expo/vector-icons';
 
 const Chat = () => {
   const [messages, setMessages] = useState([{ type: 'user', text: "test in"}, { type: 'bot', text: "testing" }]);
+  const [messagesCache, setMessageCache] = useState([{ type: 'user', text: "test in"}, { type: 'bot', text: "testing" }]);
   const [inputText, setInputText] = useState('');
   const [isloading, setIsLoading] = useState(false);
   const scrollViewRef = useRef();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const sendIcon = <Icon name="send" size={19} color="white" />;
 
   const toggleModal = () => {
@@ -28,6 +30,7 @@ const Chat = () => {
           const response = await fetch(`http://127.0.0.1:5000/chat/${messagesloader}`);
           const text = await response.json();
           setMessages([...messages, { type: 'user', text: messagesloader },{ type: 'bot', text: text.response }]);
+          setMessageCache([...messagesCache,{ type: 'user', text: messagesloader },{type: 'bot', text: text.response}])
           setIsLoading(false);
         } else {
           Alert.alert('Empty input');
@@ -38,11 +41,29 @@ const Chat = () => {
         }    
     }
 
+    const handleRemove = async() => {
+        if (messagesCache != '') {
+          setMessageCache([]);
+        }
+    }
+
+    const handleSendAndRemove = async() => {
+      await handleRemove();
+      await handleSend();
+    }
+
+
+
+    // useEffect(() => {
+    //   if (scrollViewRef.current) {
+    //     scrollViewRef.current.scrollToEnd({ animated: true });
+    //   }
+    // }, [messages]);
+
     useEffect(() => {
-      if (scrollViewRef.current) {
-        scrollViewRef.current.scrollToEnd({ animated: true });
-      }
+      scrollViewRef.current.scrollToEnd({ animated: true });
     }, [messages]);
+  
 
   return (
     <View style={styles.container}>
@@ -51,13 +72,21 @@ const Chat = () => {
           style={styles.image}
       />
 
-      <ScrollView ref={scrollViewRef} style={styles.chatContainer} contentContainerStyle={{ paddingBottom: 100 }}>
+      {isFocused == (false) &&(<ScrollView ref={scrollViewRef} style={styles.chatContainer} contentContainerStyle={{ paddingBottom: 100 }}>
         {messages.map((item, index) => (
           <View key={index} style={item.type === 'user' ? styles.userBubble : styles.botBubble}>
             <Text style={item.type ==='user'? styles.userMessageText:styles.botMessageText}>{item.text}</Text>
           </View>
         ))}
-      </ScrollView>
+      </ScrollView>)}
+
+      {isFocused == (true) &&(<ScrollView ref={scrollViewRef} style={styles.chatContainer} contentContainerStyle={{ paddingBottom: 100 }}>
+        {messagesCache.map((item, index) => (
+          <View key={index} style={item.type === 'user' ? styles.userBubble : styles.botBubble}>
+            <Text style={item.type ==='user'? styles.userMessageText:styles.botMessageText}>{item.text}</Text>
+          </View>
+        ))}
+      </ScrollView>)}
 
       <TouchableOpacity style={styles.modalButton} onPress={toggleModal}>
         <Text style={styles.buttonText}><FontAwesome name="chevron-up" size={21} color="white" /></Text>
@@ -98,9 +127,11 @@ const Chat = () => {
           value={inputText}
           onChangeText={setInputText}
           placeholder="Ask me anything"
+          onFocus={() => setIsFocused(true)}   
+          onBlur={() => setIsFocused(false)}
         />
 
-      {inputText !== '' && isloading == (false) &&(<TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={inputText === ''}>
+      {inputText !== '' && isloading == (false) &&(<TouchableOpacity style={styles.sendButton} onPress={handleSendAndRemove} disabled={inputText === ''}>
           <Text style={styles.buttonText}>{sendIcon}</Text>
       </TouchableOpacity>)}
       {inputText !== '' && isloading == (true) &&(<TouchableOpacity style={styles.sendDisButton} disabled>
@@ -113,23 +144,27 @@ const Chat = () => {
 };
 
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   image: {
     width: "100%",
-    height: 200,
+    height: 100,
     top: 0,
     left: 0,
     opacity: 0.1,
   },
+
   chatContainer: {
     flex: 1,
     width: '100%',
   },
+
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -138,6 +173,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: 'lightgray',
   },
+
   input: {
     flex: 1,
     height: 40,
@@ -148,6 +184,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginRight: 10,
   },
+
   sendButton: {
     backgroundColor: '#6666FF',
     borderRadius: 20,
@@ -173,7 +210,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     padding: 10,
     margin: 5,
-    borderRadius: 10,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
     maxWidth: '70%',
   },
   botBubble: {
@@ -181,7 +220,10 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     padding: 10,
     margin: 5,
-    borderRadius: 10,
+    // borderRadius: 10,
+    borderTopRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
     maxWidth: '70%',
   },
   botMessageText: {
