@@ -66,7 +66,7 @@ const Chat = () => {
       try {
         const jsonValue = JSON.stringify(messages)
         await AsyncStorage.setItem('savedChat', jsonValue)
-        console.log("save" + jsonValue)
+        console.log("saved\n",jsonValue)
       } catch (e) {
         console.log(e)
       }
@@ -78,7 +78,7 @@ const Chat = () => {
       if(jsonValue !== null) {
           chat = JSON.parse(jsonValue)
           setMessages(chat)
-          console.log(chat)
+          console.log("get message\n",chat)
       }
   } catch(e) {
       console.log(e)
@@ -91,11 +91,11 @@ const Chat = () => {
 
   useEffect(() => {
       getChat();
-      // delChat();
-      return ()=> {
-        saveChat();
-      }
   },[]);
+
+  useEffect(() => {
+      saveChat();
+},[messages]);
 
 
     const handleRemove = async() => {
@@ -223,6 +223,9 @@ const Chat = () => {
       {inputText !== '' && isloading == (true) &&(<TouchableOpacity style={styles.sendDisButton} disabled>
           <Text style={styles.buttonText} >唔好咁心急啦,我諗緊野😣</Text>
       </TouchableOpacity>)}
+      <TouchableOpacity  style={styles.sendButton} onPress={checking}>
+          <Text style={styles.buttonText}>Check</Text>
+      </TouchableOpacity>
 
       </View>
     </View>
