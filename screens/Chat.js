@@ -22,32 +22,51 @@ const Chat = () => {
   // };
   
 
-  const handleSend = async() => {
-    try{
-        if (inputText !== '') {
-          const messagesloader = inputText;
-          setInputText('');
-          setIsLoading(true);
-          setMessages([...messages, { type: 'user', text:messagesloader },{ type: 'bot', text: "loading" }]);
-          const response = await fetch(`http://127.0.0.1:5000/chat/${messagesloader}`);
-          const text = await response.json();
-          setMessages([...messages, { type: 'user', text: messagesloader },{ type: 'bot', text: text.response }]);
-          setMessageCache([...messagesCache,{ type: 'user', text: messagesloader },{type: 'bot', text: text.response}])
-          setIsLoading(false);
-        } else {
-          Alert.alert('Empty input');
-        }
-    }
-    catch (error) {
-          console.error(error);
-        }    
-    }
+  // const handleSend = async() => {
+  //   try{
+  //       if (inputText !== '') {
+  //         const messagesloader = inputText;
+  //         setInputText('');
+  //         setIsLoading(true);
+  //         setMessages([...messages, { type: 'user', text:messagesloader },{ type: 'bot', text: "loading" }]);
+  //         const response = await fetch(`http://127.0.0.1:5000/chat/${messagesloader}`);
+  //         const text = await response.json();
+  //         setMessages([...messages, { type: 'user', text: messagesloader },{ type: 'bot', text: text.response }]);
+  //         setMessageCache([...messagesCache,{ type: 'user', text: messagesloader },{type: 'bot', text: text.response}])
+  //         setIsLoading(false);
+  //         console.log(messages)
+  //       } else {
+  //         Alert.alert('Empty input');
+  //       }
+  //   }
+  //   catch (error) {
+  //         console.error(error);
+  //       }    
+  //   }
+
+    const handleSend = async() => {
+      
+          if (inputText !== '') {
+            const messagesloader = inputText;
+            setInputText('');
+            setIsLoading(true);
+            setMessages([...messages, { type: 'user', text:messagesloader },{ type: 'bot', text: "loading" }]);
+            const response = await fetch(`http://127.0.0.1:5000/chat/${messagesloader}`);
+            const text = await response.json();
+            setMessages([...messages, { type: 'user', text: messagesloader },{ type: 'bot', text: text.response }]);
+            setMessageCache([...messagesCache,{ type: 'user', text: messagesloader },{type: 'bot', text: text.response}])
+            setIsLoading(false);
+            console.log(messages)
+          } else {
+            Alert.alert('Empty input');
+          }   
+      }
 
     const saveChat = async () => {
       try {
         const jsonValue = JSON.stringify(messages)
         await AsyncStorage.setItem('savedChat', jsonValue)
-        console.log(jsonValue)
+        console.log("save" + jsonValue)
       } catch (e) {
         console.log(e)
       }
@@ -67,12 +86,17 @@ const Chat = () => {
   }
 
   const delChat = async () => {
-      AsyncStorage.removeItem('savedChat')
+      await AsyncStorage.removeItem('savedChat')
     } 
 
   useEffect(() => {
       getChat();
+      // delChat();
+      return ()=> {
+        saveChat();
+      }
   },[]);
+
 
     const handleRemove = async() => {
       if (messagesCache != '') {
@@ -80,11 +104,15 @@ const Chat = () => {
       }
   }
 
+  const checking = async() => {
+    console.log("real")
+    console.log(messages)
+}
+
   const handleSendAndRemove = async() => {
     await handleRemove();
     await handleSend();
-    // await delChat();
-    await saveChat();
+    await checking();
   }
 
     const [imagePosition, setImagePosition] = useState({
@@ -92,15 +120,15 @@ const Chat = () => {
       y: Math.floor(Math.random() * 200),
     });
   
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setImagePosition({
-          x: Math.floor(Math.random() * -100),
-          y: Math.floor(Math.random() * 200),
-        });
-      }, 3000);
-      return () => clearInterval(interval);
-    }, []);
+    // useEffect(() => {
+    //   const interval = setInterval(() => {
+    //     setImagePosition({
+    //       x: Math.floor(Math.random() * -100),
+    //       y: Math.floor(Math.random() * 200),
+    //     });
+    //   }, 3000);
+    //   return () => clearInterval(interval);
+    // }, []);
   
 
     // useEffect(() => {
