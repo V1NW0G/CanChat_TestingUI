@@ -2,19 +2,25 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Button, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert } from "react-native";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
-const backImage = require("../assets/backImage.png");
+const backImage = require("../assets/backImage2.jpg");
 
 export default function Signup({ navigation }) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [verpassword, setVerPassword] = useState('');
 
 const onHandleSignup = () => {
+  if (password == verpassword){
     if (email !== '' && password !== '') {
-  createUserWithEmailAndPassword(auth, email, password)
+        createUserWithEmailAndPassword(auth, email, password)
         .then(() => console.log('Signup success'))
         .catch((err) => Alert.alert("Login error", err.message));
     }
+  }
+  else{
+      Alert.alert("Password not match"); 
+  }
   };
   
   return (
@@ -43,6 +49,18 @@ const onHandleSignup = () => {
         value={password}
         onChangeText={(text) => setPassword(text)}
       />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Retype password"
+        autoCapitalize="none"
+        autoCorrect={false}
+        secureTextEntry={true}
+        textContentType="password"
+        value={verpassword}
+        onChangeText={(text) => setVerPassword(text)}
+      />
+
       <TouchableOpacity style={styles.button} onPress={onHandleSignup}>
         <Text style={{fontWeight: 'bold', color: '#fff', fontSize: 18}}> Sign Up</Text>
       </TouchableOpacity>

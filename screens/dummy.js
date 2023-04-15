@@ -17,9 +17,6 @@ const Chat = () => {
   const [isFocused, setIsFocused] = useState(false);
   const sendIcon = <Icon name="send" size={19} color="white" />;
 
-  // const toggleModal = () => {
-  //   setIsModalVisible(!isModalVisible);
-  // };
   
 
   const handleSend = async() => {
@@ -44,37 +41,33 @@ const Chat = () => {
     }
 
     const saveChat = async () => {
-      try {
-        const jsonValue = JSON.stringify(messages)
-        await AsyncStorage.setItem('savedChat', jsonValue)
-        console.log(jsonValue)
-      } catch (e) {
-        console.log(e)
+        try {
+          await AsyncStorage.setItem('savedChat', messages)
+        } catch (e) {
+          console.log(e)
+        }
       }
+
+    const getChat = async () => {
+    try {
+        const chat = await AsyncStorage.getItem('savedChat')
+        if(chat !== null) {
+            setMessages(chat)
+        }
+    } catch(e) {
+        console.log(e)
+    }
     }
 
-  const getChat = async () => {
-  try {
-      const jsonValue = await AsyncStorage.getItem('savedChat')
-      if(jsonValue !== null) {
-          chat = JSON.parse(jsonValue)
-          setMessages(chat)
-          console.log(chat)
-      }
-  } catch(e) {
-      console.log(e)
-  }
-  }
+    const delChat = async () => {
+        AsyncStorage.removeItem('savedChat')
+      } 
 
-  const delChat = async () => {
-      AsyncStorage.removeItem('savedChat')
-    } 
+    React.useEffect(() => {
+        getChat();
+    },[]);
 
-  useEffect(() => {
-      getChat();
-  },[]);
-
-    const handleRemove = async() => {
+  const handleRemove = async() => {
       if (messagesCache != '') {
         setMessageCache([]);
       }
@@ -83,7 +76,7 @@ const Chat = () => {
   const handleSendAndRemove = async() => {
     await handleRemove();
     await handleSend();
-    // await delChat();
+    await delChat();
     await saveChat();
   }
 
@@ -103,12 +96,6 @@ const Chat = () => {
     }, []);
   
 
-    // useEffect(() => {
-    //   if (scrollViewRef.current) {
-    //     scrollViewRef.current.scrollToEnd({ animated: true });
-    //   }
-    // }, [messages]);
-
     useEffect(() => {
       scrollViewRef.current.scrollToEnd({ animated: true });
     }, [messages]);
@@ -122,61 +109,13 @@ const Chat = () => {
       
       />
 
-      {/* {isFocused == (false) &&(<ScrollView ref={scrollViewRef} style={styles.chatContainer} contentContainerStyle={{ paddingBottom: 100 }}>
-        {messages.map((item, index) => (
-          <View key={index} style={item.type === 'user' ? styles.userBubble : styles.botBubble}>
-            <Text style={item.type ==='user'? styles.userMessageText:styles.botMessageText}>{item.text}</Text>
-          </View>
-        ))}
-      </ScrollView>)}
-
-      {isFocused == (true) &&(<ScrollView ref={scrollViewRef} style={styles.chatContainer} contentContainerStyle={{ paddingBottom: 100 }}>
-        {messagesCache.map((item, index) => (
-          <View key={index} style={item.type === 'user' ? styles.userBubble : styles.botBubble}>
-            <Text style={item.type ==='user'? styles.userMessageText:styles.botMessageText}>{item.text}</Text>
-          </View>
-        ))}
-      </ScrollView>)} */}
-{/* contentContainerStyle={{ paddingBottom: 100 }} */}
-      <ScrollView ref={scrollViewRef} style={styles.chatContainer} >
+      <ScrollView ref={scrollViewRef} style={styles.chatContainer} contentContainerStyle={{ paddingBottom: 100 }}>
         {messages.map((item, index) => (
           <View key={index} style={item.type === 'user' ? styles.userBubble : styles.botBubble}>
             <Text style={item.type ==='user'? styles.userMessageText:styles.botMessageText}>{item.text}</Text>
           </View>
         ))}
       </ScrollView>
-
-      {/* <TouchableOpacity style={styles.modalButton} onPress={toggleModal}>
-        <Text style={styles.buttonText}><FontAwesome name="chevron-up" size={21} color="white" /></Text>
-      </TouchableOpacity> */}
-
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={toggleModal}
-      >  
-        <View style={styles.modalContainer}>
-        <TouchableOpacity style={styles.modalButtonOpen} onPress={toggleModal}>
-            <Text style={styles.buttonText}><FontAwesome name="chevron-down" size={21} color="white" /></Text>
-          </TouchableOpacity>
-          <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTittle}>Chat History</Text>
-            <TouchableOpacity style={styles.closeButton}>
-              <Text style={styles.buttonText}>Copy?</Text>
-            </TouchableOpacity>
-          </View>
-            <ScrollView ref={scrollViewRef} style={styles.chatContainer} contentContainerStyle={{ paddingBottom: 100 }}>
-              {messages.map((item, index) => (
-                <View key={index} style={item.type === 'user' ? styles.userBubble : styles.botBubble}>
-                  <Text style={item.type ==='user'? styles.userMessageText:styles.botMessageText}>{item.text}</Text>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal> */}
 
 
       <View style={styles.inputContainer}>
@@ -221,8 +160,6 @@ const styles = StyleSheet.create({
   chatContainer: {
     flex: 1,
     width: '100%',
-    height: "50%"
-
   },
 
   inputContainer: {
@@ -318,42 +255,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // modalTittle: { 
-  //   textAlign: 'center', 
-  //   paddingTop: 10,
-  //   paddingLeft: 90,
-  //   color: 'black',
-  //   fontSize: 20,
-  //   fontWeight: 'bold',
-  // },
-  // modalHeader: {
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   marginBottom: 10,
-  // },
-
-  // modalContainer: {
-  //   flex: 1,
-  //   alignItems: 'center',
-  //   justifyContent: 'center',
-  //   backgroundColor: 'rgba(0,0,0,0.5)',
-  // },
-  
-  // modalContent: {
-  //   backgroundColor: 'white',
-  //   padding: 5,
-  //   borderRadius: 20,
-  //   width: '93%',
-  //   height: '86%',
-  // },
-  // closeButton: {
-  //   backgroundColor: '#2196F3',
-  //   width: '30%',
-  //   padding: 10,
-  //   borderRadius: 5,
-  //   marginTop: 20,
-  // },
 });
 
 
