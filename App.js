@@ -8,6 +8,7 @@ import Login from './screens/Login';
 import Signup from './screens/Signup';
 import Chat from './screens/Chat';
 import Home from './screens/Home';
+import ChatP from './screens/ChatP';
 import CardDetail from './screens/CardDetail';
 
 const Stack = createStackNavigator();
@@ -28,7 +29,8 @@ function ChatStack() {
       {/* here */}
       <Stack.Screen name='Home' component={Home} />
       <Stack.Screen name='CardDetail' component={CardDetail} />
-      <Stack.Screen name='Chat' component={Chat} />
+      <Stack.Screen options={{headerShown: false}} name='Chat' component={Chat} />
+      <Stack.Screen options={{headerShown: false}} name='ChatP' component={ChatP} />
     </Stack.Navigator>
   );
 }
@@ -68,8 +70,8 @@ if (isLoading) {
 return (
     <NavigationContainer>
       {/* here */}
-      {user ? <ChatStack /> : <AuthStack />}
-      {/* < ChatStack />  */}
+      {/* {user ? <ChatStack /> : <AuthStack />} */}
+      < ChatStack /> 
     </NavigationContainer>
   );
 }

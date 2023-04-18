@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Linking} from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Linking, ScrollView} from 'react-native';
 
 const CardDetail = ({ route }) => {
   const { cardTitle, cardDetails, cardDate , cardImage , linkTo, linkButton} = route.params;
@@ -14,6 +14,7 @@ const CardDetail = ({ route }) => {
     <View style={styles.card}>
       <Text style={styles.cardtitle}>{cardTitle}</Text>
       <Image source={{ uri: cardImage}} style={styles.cardImage} />
+    <ScrollView style={styles.cardscroll}>
       <Text style={styles.cardContent}>{cardDetails}</Text>
       <Text>{cardDate}</Text>
 
@@ -22,6 +23,8 @@ const CardDetail = ({ route }) => {
           <Text style={{fontWeight: 'bold', color: '#212121', fontSize: 18}}>{linkButton}</Text>
         </TouchableOpacity>
       )}
+
+    </ScrollView>
 
     </View>
     </View>
@@ -47,6 +50,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+
+  cardscroll:{
+    paddingTop:20,
   },
 
   cardImage: {

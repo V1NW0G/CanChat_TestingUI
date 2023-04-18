@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { KeyboardAvoidingView,View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, Alert, Image, Modal} from 'react-native';
+import {KeyboardAvoidingView, View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet, Alert, Image, Modal} from 'react-native';
 const backImage = require("../assets/blue-cat.gif");
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
+import colors from '../colors';
 // import CustomOverlay from './ChatScreen/CustomOverlay';
 
 
@@ -18,9 +19,9 @@ import surprisedImage from '../assets/emotion/shocked.gif';
 
 
 // { type: 'user', text: "test in"}, { type: 'bot', text: "testing" }
-const Chat = () => {
+const ChatP = () => {
   const navigation = useNavigation();
-  const [messages, setMessages] = useState([{ type: 'bot', text: "同我傾偈啦" }]);
+  const [messages, setMessages] = useState([{ type: 'bot', text: "有咩想靜雞雞同我講?" }]);
   const [messagesCache, setMessageCache] = useState([{ type: 'user', text: "test in"}, { type: 'bot', text: "testing" }]);
   const [inputText, setInputText] = useState('');
   const [isloading, setIsLoading] = useState(false);
@@ -29,7 +30,7 @@ const Chat = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [emotion, setEmotion] = useState("neutral");
   const [intent, setIntent] = useState("");
-  const [showButtons, setShowButtons] = useState(true);
+  const [showButtons, setShowButtons] = useState(false);
   // icon
   const sendIcon = <MaterialCommunityIcons name="send" size={19} color="white" />;
   const closeIcon = <MaterialCommunityIcons name="close" size={34} color="Black" />;
@@ -96,7 +97,6 @@ const emotionImages = {
           setMessages([...messages, { type: 'user', text: messagesloader },{ type: 'bot', text: text.response }]);
           setMessageCache([...messagesCache,{ type: 'user', text: messagesloader },{type: 'bot', text: text.response}])
           setIsLoading(false);
-          setShowButtons(false);
           console.log(messages)
         } else {
           Alert.alert('Empty input');
@@ -104,36 +104,8 @@ const emotionImages = {
     }
     catch (error) {
       setMessages([...messages, { type: 'user', text:messagesloader },{ type: 'bot', text: "我busy" }]);
-      }    
+        }    
     }
-
-
-    const promtPress = (text) => {
-      setInputText(text);
-    };
-
-  const saveChat = async () => { 
-    try {
-      const jsonValue = JSON.stringify(messages)
-      await AsyncStorage.setItem('savedChat', jsonValue)
-      // console.log("saved\n",jsonValue)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  const getChat = async () => {
-  try {
-      const jsonValue = await AsyncStorage.getItem('savedChat')
-      if(jsonValue !== null) {
-          chat = JSON.parse(jsonValue)
-          setMessages(chat)
-          // console.log("get message\n",chat)
-      }
-  } catch(e) {
-      console.log(e)
-  }
-  }
 
   const saveIntent = async () => {
     try {
@@ -143,7 +115,6 @@ const emotionImages = {
       console.log(e)
     }
   }
-
 
   
     const getIntent = async () => {
@@ -157,48 +128,20 @@ const emotionImages = {
           console.log(e)
       }
    }
-
-   const savePrompt = async () => { 
-    try {
-      await AsyncStorage.setItem('savedPrompt', showButtons)
-    } catch (e) {
-      console.log(e)
-    }
-  }
-
-  const getPrompt = async () => {
-    try {
-        const value = await AsyncStorage.getItem('savedPrompt')
-        if(value !== null) {
-          console.log("prompt",value)
-            setShowButtons(value)
-        }
-    } catch(e) {
-        console.log(e)
-    }
- }
-
-  
-  useEffect(()=> {
-    savePrompt
-  },[showButtons]);
-
-
   
   
   useEffect(() => {
-    getPrompt();
     setIsLoading(false);
     scrolltoend();
-    getChat();
+    
       // return () => {
          
       // }
   },[]);
 
   useEffect(() => {
-    getIntent
-    saveChat();
+    getIntent();
+ 
 },[messages]);
 
 useEffect(() => {
@@ -329,29 +272,7 @@ useEffect(() => {
       </Modal> */}
 
 
-    {showButtons &&(<View style={styles.promptContainer}>
-    <TouchableOpacity onPressIn={() => promtPress('Hi')} onPressOut={handleSend}>
-      <View style={styles.promptBubble}>
-        <Text style={styles.promptMessageText}>Hi!</Text>
-        </View>
-    </TouchableOpacity>
-
-    <TouchableOpacity onPressIn={() => promtPress('你可以做到咩')} onPressOut={handleSend}>
-      <View style={styles.promptBubble}>
-        <Text style={styles.promptMessageText}>你可以做到咩</Text>
-        </View>
-    </TouchableOpacity>
-
-    <TouchableOpacity onPressIn={() => promtPress('你同AI有咩分別')} onPressOut={handleSend}>
-      <View style={styles.promptBubble}>
-        <Text style={styles.promptMessageText}>你同AI有咩分別</Text>
-        </View>
-    </TouchableOpacity>
-    
-    </View>)}
-  
-    
-    <KeyboardAvoidingView
+<KeyboardAvoidingView
       style={styles.inputContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={10} // adjust this value as needed
@@ -361,8 +282,8 @@ useEffect(() => {
           style={styles.input}
           value={inputText}
           onChangeText={setInputText}
-          placeholder="點擊同我開始對話"
-          placeholderTextColor="#adadad" 
+          placeholder="👉🏻點擊同我開始對話"
+          placeholderTextColor="#949494" 
           onFocus={() => setIsFocused(true)}   
           onBlur={() => setIsFocused(false)}
         />
@@ -384,7 +305,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.darkBG,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -410,17 +331,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
-    marginBottom: 10,
     // borderTopWidth: 1,
-    borderTopColor: 'lightgray',
+    borderTopColor: '#757575',
   },
 
   input: {
+    fontWeight: "bold",
+    color: 'white',
     flex: 1,
     height: 40,
     width: '30%',
     borderWidth: 1,
-    borderColor: 'lightgray',
+    borderColor: '#757575',
     borderRadius: 20,
     paddingHorizontal: 20,
     marginRight: 10,
@@ -447,8 +369,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   userBubble: {
-    backgroundColor: 'lightblue',
+    backgroundColor: colors.darkBG,
     alignSelf: 'flex-end',
+    borderWidth: 1,
+    borderColor: '#757575',
     padding: 10,
     margin: 5,
     borderTopLeftRadius: 10,
@@ -457,8 +381,10 @@ const styles = StyleSheet.create({
     maxWidth: '70%',
   },
   botBubble: {
-    backgroundColor: 'lightgray',
+    backgroundColor: '#61ffd5',
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#757575',
     padding: 10,
     margin: 5,
     // borderRadius: 10,
@@ -474,26 +400,7 @@ const styles = StyleSheet.create({
   userMessageText: {
     color: 'white',
     fontSize: 18,
-  },
-  
-  promptBubble: {
-    backgroundColor: 'lightblue',
-    alignSelf: 'flex-end',
-    padding: 10,
-    margin: 5,
-    borderRadius:10,
-    maxWidth: '100%',
-  },
-
-  promptMessageText: {
-    color: 'white',
-    fontSize: 18,
-  },
-
-  promptContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+  }, 
   
   // modalButton: {
   //   backgroundColor: '#6666FF',
@@ -598,4 +505,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default Chat;
+export default ChatP;
